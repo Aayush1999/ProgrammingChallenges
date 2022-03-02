@@ -47,9 +47,19 @@ marketing_data contains ad impression and click data by date and location:
  Merge these two datasets so we can see impressions, clicks, and revenue together by date
 and geo.
  Please ensure all records from each table are accounted for.
->  select sr.date, md.geo, sr.store_location, impressions, clicks, revenue 
->  from marketing_data md left join store_revenue sr on sr.date = md.date
->  group by sr.date, md.geo
+> select md.dat, md.geo, impressions, clicks, sum(revenue) as Revenue
+> from marketing_data md join store_revenue sr on md.geo = sr.store_location
+> where md.dat = sr.dat
+> group by md.geo, sr.dat
+> UNION
+> select md.dat, md.geo, impressions, clicks, 0 as Revenue
+> from marketing_data md join store_revenue sr on md.dat = sr.dat
+> where md.geo = "MN"
+> group by md.geo, md.dat
+> UNION 
+> select distinct sr.dat, md.geo, impressions = 0, clicks = 0, revenue as Revenue
+> from store_revenue sr left join marketing_data md on md.geo = sr.store_location
+> where sr.dat = '2016-01-06'
 ​
 * Question #4
  In your opinion, what is the most efficient store and why?
